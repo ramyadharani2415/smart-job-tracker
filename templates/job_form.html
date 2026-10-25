@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if job else 'Add' }} Job{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h2>{{ 'Edit Job' if job else 'Add Job' }}</h2>
+  <form method="POST">
+    <label>Company *</label>
+    <input type="text" name="company" list="company-list" autocomplete="off"
+           placeholder="Type or choose a company" required
+           value="{{ job.company if job else '' }}">
+    <datalist id="company-list">
+      {% for c in companies %}<option value="{{ c }}">{% endfor %}
+    </datalist>
+
+    <label>Role *</label>
+    <input type="text" name="role" list="role-list" autocomplete="off"
+           placeholder="Type or choose a role" required
+           value="{{ job.role if job else '' }}">
+    <datalist id="role-list">
+      {% for r in roles %}<option value="{{ r }}">{% endfor %}
+    </datalist>
+
+    <label>Location</label>
+    <input type="text" name="location" value="{{ job.location if job and job.location else '' }}">
+
+    <label>Status</label>
+    <select name="status">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if job and job.status == s %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Applied Date</label>
+    <input type="date" name="applied_date"
+           value="{{ job.applied_date.isoformat() if job and job.applied_date else today }}">
+
+    <label>Job Link</label>
+    <input type="url" name="link" placeholder="https://..." value="{{ job.link if job and job.link else '' }}">
+
+    <label>Notes</label>
+    <textarea name="notes" rows="4">{{ job.notes if job and job.notes else '' }}</textarea>
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Save</button>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-light">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

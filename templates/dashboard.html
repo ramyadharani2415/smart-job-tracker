@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="stats">
+  <div class="stat"><span>{{ total }}</span>Total</div>
+  {% for s in statuses %}
+    <div class="stat {{ s|lower }}"><span>{{ counts[s] }}</span>{{ s }}</div>
+  {% endfor %}
+</div>
+
+{% if total > 0 %}
+<div class="card chart-card">
+  <canvas id="statusChart"></canvas>
+</div>
+{% endif %}
+
+<form method="GET" class="filter-bar">
+  <input type="text" name="q" placeholder="Search company or role" value="{{ q }}">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}
+      <option value="{{ s }}" {% if s == selected %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn">Filter</button>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-light">Reset</a>
+</form>
+
+<div class="card">
+  {% if jobs %}
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Company</th><th>Role</th><th>Location</th>
+        <th>Status</th><th>Applied</th><th>Actions</th>
+      </tr>
+      {% for job in jobs %}
+      <tr>
+        <td>
+          {% if job.link %}<a href="{{ job.link }}" target="_blank">{{ job.company }}</a>
+          {% else %}{{ job.company }}{% endif %}
+        </td>
+        <td>{{ job.role }}</td>
+        <td>{{ job.location or '-' }}</td>
+        <td><span class="badge {{ job.status|lower }}">{{ job.status }}</span></td>
+        <td>{{ job.applied_date or '-' }}</td>
+        <td class="actions">
+          <a href="{{ url_for('edit_job', job_id=job.id) }}">Edit</a>
+          <form method="POST" action="{{ url_for('delete_job', job_id=job.id) }}"
+                onsubmit="return confirm('Delete this job?');">
+            <button type="submit" class="link-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">No jobs found. <a href="{{ url_for('add_job') }}">Add your first job</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if total > 0 %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+  const counts = {{ counts | tojson }};
+  new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        data: Object.values(counts),
+        backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#ef4444']
+      }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+</script>
+{% endif %}
+{% endblock %}

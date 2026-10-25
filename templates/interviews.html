@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Interviews{% endblock %}
+{% block content %}
+<h1>Interviews</h1>
+
+<div class="card form-card">
+  <h3>Schedule an Interview</h3>
+  {% if jobs %}
+  <form method="POST">
+    <label>Job</label>
+    <select name="job_id" required>
+      {% for job in jobs %}
+        <option value="{{ job.id }}">{{ job.company }} - {{ job.role }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Date</label>
+    <input type="date" name="interview_date" value="{{ today }}" required>
+
+    <label>Mode</label>
+    <select name="mode">
+      <option>Online</option>
+      <option>Phone</option>
+      <option>On-site</option>
+    </select>
+
+    <label>Notes</label>
+    <textarea name="notes" rows="3" placeholder="Round, topics to prepare, interviewer..."></textarea>
+
+    <button type="submit" class="btn">Add Interview</button>
+  </form>
+  {% else %}
+    <p class="muted">Add a job first, then schedule interviews.
+      <a href="{{ url_for('add_job') }}">Add job</a></p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Upcoming &amp; Past Interviews</h3>
+  {% if items %}
+  <div class="table-wrap">
+    <table>
+      <tr><th>Date</th><th>Company</th><th>Role</th><th>Mode</th><th>Notes</th><th></th></tr>
+      {% for iv in items %}
+      <tr>
+        <td>{{ iv.interview_date }}</td>
+        <td>{{ iv.job.company }}</td>
+        <td>{{ iv.job.role }}</td>
+        <td>{{ iv.mode }}</td>
+        <td>{{ iv.notes or '-' }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('delete_interview', iv_id=iv.id) }}"
+                onsubmit="return confirm('Remove this interview?');">
+            <button type="submit" class="link-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">No interviews scheduled yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
