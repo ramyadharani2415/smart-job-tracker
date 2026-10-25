@@ -11,9 +11,9 @@ A Flask web app to track job applications and interviews.
 - SQLite database using Flask-SQLAlchemy
 
 ## Screenshots
-![Dashboard](screenshots/dashboard.png)
-![Add Job](screenshots/add-job.png)
-![Interviews](screenshots/interviews.png)
+![Dashboard](Screenshots/dashboard.png)
+![Add Job](Screenshots/add-job.png)
+![Interviews](Screenshots/interviews.png)
 
 ## Tech Stack
 Python, Flask, Flask-SQLAlchemy, Flask-Login, SQLite, HTML, CSS, Jinja2
